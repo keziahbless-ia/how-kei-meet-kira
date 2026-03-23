@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>woven hearts · a spiritual scrapbook</title>
+  <!-- Google Fonts: Poppins & Montserrat -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 (free icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<audio id="heartSound" src="TechAd ka talaga dyan.mp3"></audio>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(145deg, #7B3F61 0%, #9b5b7a 35%, #C8A2C8 100%);
+      background-attachment: fixed;
+      color: #fef7e8;
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+    }
+
+    /* full-screen sections */
+    .section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+      position: relative;
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.9s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.8s ease;
+    }
+
+    .section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* two-column grid */
+    .two-col {
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+      align-items: center;
+    }
+
+    /* text styling */
+    .text-content p {
+      font-size: 1.35rem;
+      line-height: 1.6;
+      font-weight: 400;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      background: rgba(0,0,0,0.2);
+      padding: 1.8rem;
+      border-radius: 28px;
+      backdrop-filter: blur(2px);
+      letter-spacing: 0.2px;
+    }
+
+    /* polaroid base */
+    .polaroid {
+      background: #fffef7;
+      padding: 12px 12px 20px 12px;
+      box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0,0,0,0.1);
+      border-radius: 4px;
+      display: inline-block;
+      transition: all 0.3s ease;
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .polaroid img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 2px;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+    }
+
+    /* random rotations + hover lift & rotate */
+    .polaroid {
+      transform: rotate(var(--rot, -1deg));
+      transition: transform 0.25s ease, box-shadow 0.3s;
+    }
+
+    .polaroid:hover {
+      transform: rotate(0deg) scale(1.02) translateY(-8px);
+      box-shadow: 0 28px 32px -14px rgba(0, 0, 0, 0.4);
+    }
+
+    /* individual rotation variations */
+    .polaroid-1 { --rot: -2deg; }
+    .polaroid-2 { --rot: 2.5deg; }
+    .polaroid-3 { --rot: -1.8deg; }
+    .polaroid-4 { --rot: 1.5deg; }
+    .polaroid-5 { --rot: -0.8deg; }
+    .polaroid-6 { --rot: 2deg; }
+
+    /* tape stickers (optional corners) */
+    .polaroid::before {
+      content: "✧";
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      position: absolute;
+      top: -10px;
+      left: 15px;
+      font-size: 28px;
+      color: rgba(255,245,210,0.8);
+      text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+      transform: rotate(-12deg);
+      pointer-events: none;
+    }
+
+    .polaroid::after {
+      content: "♡";
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      position: absolute;
+      bottom: -8px;
+      right: 12px;
+      font-size: 22px;
+      color: rgba(230,180,200,0.8);
+      transform: rotate(5deg);
+    }
+
+    /* specific glow effect for section 3 */
+    .glow-polaroid {
+      filter: drop-shadow(0 0 10px rgba(255,235,190,0.7)) drop-shadow(0 0 4px #f7d9b0);
+      transition: filter 0.3s;
+    }
+
+    /* two polaroids container (section 4) */
+    .double-polaroid {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      position: relative;
+      align-items: center;
+    }
+
+    .double-polaroid .polaroid {
+      width: 240px;
+    }
+
+    /* doodle/string connector */
+    .string-connector {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .string-svg {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* MESSENGER UI (chat left) */
+    .messenger-card {
+      background: #ffe4f0;
+      border-radius: 28px;
+      padding: 1.5rem;
+      box-shadow: 0 18px 28px -12px rgba(0, 0, 0, 0.3);
+      max-width: 380px;
+      margin: 0 auto;
+      transition: all 0.2s;
+    }
+
+    .chat-bubble {
+      margin-bottom: 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bubble {
+      max-width: 85%;
+      padding: 10px 16px;
+      border-radius: 24px;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      margin-bottom: 6px;
+      font-weight: 500;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+    }
+
+    .bubble-left {
+      background: white;
+      color: #4a2a3a;
+      align-self: flex-start;
+      border-bottom-left-radius: 5px;
+    }
+
+    .bubble-right {
+      background: #f5a9c4;
+      color: #2e1a24;
+      align-self: flex-end;
+      border-bottom-right-radius: 5px;
+    }
+
+    .chat-name {
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      margin-left: 8px;
+      color: #7b4f63;
+    }
+
+    .voice-controls {
+      margin-top: 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .voice-btn {
+      background: #c97c9e;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 60px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+    }
+
+    .voice-btn:hover {
+      background: #b25d84;
+      transform: scale(0.96);
+    }
+
+    /* final section glow */
+    .final-glow {
+      text-align: center;
+      max-width: 750px;
+      margin: 0 auto;
+      background: rgba(0,0,0,0.2);
+      backdrop-filter: blur(8px);
+      padding: 2.8rem;
+      border-radius: 56px;
+      box-shadow: 0 0 30px rgba(255,225,200,0.5), 0 0 15px #fad6c0;
+      transition: 0.4s;
+    }
+
+    .final-glow p {
+      font-size: 1.7rem;
+      font-weight: 500;
+      background: none;
+      padding: 0;
+    }
+
+    /* responsive */
+    @media (max-width: 850px) {
+      .two-col {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        text-align: center;
+      }
+      .text-content p {
+        font-size: 1.1rem;
+        padding: 1.2rem;
+      }
+      .double-polaroid .polaroid {
+        width: 200px;
+      }
+      .section {
+        padding: 2rem 1.5rem;
+      }
+      .final-glow p {
+        font-size: 1.3rem;
+      }
+    }
+
+    /* chat left column for section5 specific */
+    .chat-col {
+      display: flex;
+      justify-content: center;
+    }
+
+    /* helper for alternating order on mobile */
+    @media (max-width: 850px) {
+      .two-col .polaroid-col {
+        order: -1;
+      }
+    }
+  </style>
+</head>
+<body>
+<audio src="music.mp3" autoplay loop></audio>
+<main>
+  <!-- SECTION 1: girl (image left, text right) -->
+  <section class="section" id="sec1">
+    <div class="two-col">
+      <div class="polaroid-col">
+        <div class="polaroid polaroid-1">
+          <img src="akira.jpg" alt="thoughtful girl in soft light">
+        </div>
+      </div>
+      <div class="text-content">
+        <p>There’s this girl named Akira—but honestly, that name barely contains who she really is. She’s the kind of person na parang quiet lang at first glance, pero once you get close, you realize she carries a whole universe inside her—soft thoughts, deep feelings, and a faith that hums quietly in the background of everything she does. She has this way of making people feel seen without trying too hard, like her presence alone is already a form of comfort. She laughs gently, cares intentionally, and moves through life with a kind of sincerity that’s rare these days. And somewhere between her prayers, her late-night conversations, and her unspoken kindness, you’ll find that she’s not just someone you meet—she’s someone you end up being grateful for, the kind you don’t easily forget.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: boy (image right, text left) rotation on polaroid -->
+  <section class="section" id="sec2">
+    <div class="two-col">
+      <div class="text-content">
+        <p>Then one day, she met someone unexpected...his name is Keziah—and somehow, he didn’t arrive loudly, but he stayed deeply. He’s the kind of person who carries both creativity and conviction, someone who sees the world not just as it is, but as something he can shape, redesign, and give meaning to. May quiet intensity siya—yung tipong mapapaisip ka kung ano bang tumatakbo sa isip niya, only to realize later that he feels things deeply and expresses them in ways that linger. He listens, he observes, and when he cares, it shows—not in grand gestures, but in consistency and thoughtfulness. Between his words, his art, and his faith, you’ll see a man who’s still becoming, still growing, but already capable of leaving an impact—and maybe, just maybe, someone who became unexpectedly important in her story.</p>
+      </div>
+      <div class="polaroid-col">
+        <div class="polaroid polaroid-2">
+          <img src="keziah.jpg" alt="boy with gentle smile">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: place where they met (image left, text right) + soft glow -->
+  <section class="section" id="sec3">
+    <div class="two-col">
+      <div class="polaroid-col">
+        <div class="polaroid polaroid-3 glow-polaroid">
+          <img src="batis-aramin.jpg" alt="mountain cafe meeting place">
+        </div>
+      </div>
+      <div class="text-content">
+        <p>They met in Batis Aramin on Valentine's Day, at exactly 8:00 in the evening. The night felt still, almost as if it paused just enough to let that moment exist. Walang engrandeng eksena, walang dramatic na music dahil magkalaban sila sa Editorial Cartooning—just two people meeting at a place that would later feel more meaningful than it first seemed. And in that simple, quiet encounter, something began—something neither of them fully understood yet, but both would eventually feel.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: two separate polaroids (girl and boy) + connecting doodle/string -->
+  <section class="section" id="sec4">
+    <div class="two-col">
+      <div class="text-content">
+        <p>Since that last time they saw each other, it never happened again—after all, one is from Batangas and the other from Laguna. But despite the distance, every day and every night, they kept talking. Even if they weren’t physically together, they could feel each other’s presence in the messages, in the simple “how are you?” and in the laughs and stories shared through the screen. It was as if, even apart, they were slowly building a world just for the two of them—a space where they could be real, share dreams, and savor every little moment, even if only virtually.</p>
+      </div>
+      <div class="polaroid-col" style="position: relative;">
+        <div class="double-polaroid" id="doublePolaroidContainer">
+          <div class="polaroid polaroid-4">
+            <img src="akira.jpg" alt="girl portrait">
+          </div>
+          <div class="polaroid polaroid-5">
+            <img src="keziah.jpg" alt="boy portrait">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: MESSENGER STYLE layout chat LEFT, text RIGHT -->
+  <section class="section" id="sec5">
+    <div class="two-col">
+      <div class="chat-col">
+        <div class="messenger-card">
+          <div style="font-weight: 700; margin-bottom: 12px; display: flex; gap: 8px; align-items: center; color:#a14f6e;">
+            <i class="fab fa-facebook-messenger"></i> <span style="font-family: Poppins;">Akira Rhien Karunungan Llave</span>
+          </div>
+          <div class="chat-bubble">
+            <span class="chat-name"><i class="fas fa-user-circle"></i> kira-ai</span>
+            <div class="bubble bubble-left">hi, kei. may paparinig ako sa'yo</div>
+          </div>
+          <div class="chat-bubble">
+            <span class="chat-name"><i class="fas fa-user-circle"></i> kei</span>
+            <div class="bubble bubble-right">sure, ano 'yon?</div>
+          </div>
+          <div class="chat-bubble">
+            <span class="chat-name"><i class="fas fa-user-circle"></i> kira-ai</span>
+            <div class="bubble bubble-left" onclick="playHeartSound()">kira-ai sent a voice message.</div>
+          </div>
+          <div class="chat-bubble">
+            <span class="chat-name"><i class="fas fa-user-circle"></i> kei</span>
+            <div class="bubble bubble-right">lah angcute :> </div>
+          </div>
+          <!-- voice message area: uses your specified audio file -->
+         <div style="font-size: 0.7rem; text-align: center; margin-top: 12px; color:#b2738f; cursor: pointer;">
+  <i class="fas fa-heart"></i> tap the voice message.</div>
+        </div>
+      </div>
+      <div class="text-content">
+        <p>Even from a distance, their souls speak through Messenger — gentle words, shared verses, late-night voice notes that sound like lullabies. Each message is a small altar of trust. They laugh, they dream, they remind each other that true love doesn't rush, it anchors.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: final centered glow section -->
+  <section class="section" id="sec6">
+    <div class="final-glow">
+      <p style="font-family: Poppins; font-weight: bold; font-size: 2rem;">✧ and so they wait ✧</p>
+      <p>They don’t know what God has planned for them… but they trust that He will never leave them. Through seasons and silence, their story is held by something eternal. Love that is rooted in faith will always find its way home.</p>
+      <div style="margin-top: 30px; display: inline-block;">
+        <div class="polaroid polaroid-6" style="background: #fffef7; transform: rotate(1deg); width: 160px; margin-top: 20px;">
+          <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300&auto=format" alt="sunset horizon hope" style="aspect-ratio: 1/1;">
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+
+   function startMusic() {
+    const audio = document.getElementById('myMusic');
+    audio.play().catch(err => {
+      console.log("Autoplay blocked, waiting for user interaction.");
+    });
+    // Remove the event listener so it only triggers once
+    window.removeEventListener('click', startMusic);
+    window.removeEventListener('keydown', startMusic);
+  }
+
+  // Listen for click or key press to start music
+  window.addEventListener('click', startMusic);
+  window.addEventListener('keydown', startMusic);
+  // -------------------------------
+  // 1. INTERSECTION OBSERVER (fade/slide animations)
+  const sections = document.querySelectorAll('.section');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.2 });
+  sections.forEach(section => observer.observe(section));
+
+  // force first section visible also preemptively
+  setTimeout(() => {
+    sections[0].classList.add('visible');
+  }, 100);
+
+ function playHeartSound() {
+  var audio = document.getElementById('heartSound');
+  audio.play();
+ }
+  // -------------------------------
+  // 4. POLAROID RANDOM ADJUST (additional soft random for any polaroid without fixed class)
+  document.querySelectorAll('.polaroid:not(.polaroid-1):not(.polaroid-2):not(.polaroid-3):not(.polaroid-4):not(.polaroid-5):not(.polaroid-6)').forEach((el, idx) => {
+    const rot = (Math.random() * 5 - 2.5).toFixed(1);
+    el.style.setProperty('--rot', `${rot}deg`);
+  });
+  
+  // Optional: helper to adjust connector SVG (if needed, keep it from original but ensures no errors)
+  function adjustConnectorSVG() {
+    const container = document.getElementById('doublePolaroidContainer');
+    if (!container) return;
+    let svg = container.querySelector('.string-svg');
+    if (!svg) {
+      // If no svg exists we don't create it now to avoid clutter, original design didn't force it.
+      return;
+    }
+    const polas = container.querySelectorAll('.polaroid');
+    if (polas.length >= 2) {
+      const firstRect = polas[0].getBoundingClientRect();
+      const secondRect = polas[1].getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      const relX1 = firstRect.left + firstRect.width/2 - containerRect.left;
+      const relY1 = firstRect.top + firstRect.height/2 - containerRect.top;
+      const relX2 = secondRect.left + secondRect.width/2 - containerRect.left;
+      const relY2 = secondRect.top + secondRect.height/2 - containerRect.top;
+      const path = svg.querySelector('path');
+      if (path) {
+        const newPath = `M ${relX1},${relY1} C ${relX1 + (relX2-relX1)*0.3},${relY1-15} ${relX2 - (relX2-relX1)*0.3},${relY2-15} ${relX2},${relY2}`;
+        path.setAttribute('d', newPath);
+      }
+      const circles = svg.querySelectorAll('circle');
+      if (circles.length >= 2) {
+        circles[0].setAttribute('cx', relX1);
+        circles[0].setAttribute('cy', relY1);
+        circles[1].setAttribute('cx', relX2);
+        circles[1].setAttribute('cy', relY2);
+      }
+      const textElem = svg.querySelector('text');
+      if (textElem) {
+        const midX = (relX1 + relX2) / 2;
+        const midY = Math.min(relY1, relY2) - 18;
+        textElem.setAttribute('x', midX);
+        textElem.setAttribute('y', midY);
+      }
+    }
+  }
+  
+  window.addEventListener('resize', () => {
+    setTimeout(adjustConnectorSVG, 80);
+  });
+  setTimeout(adjustConnectorSVG, 200);
+  window.addEventListener('load', adjustConnectorSVG);
+  
+  // final glow breathing effect (keeps the original charm)
+  const finalDiv = document.querySelector('.final-glow');
+  if (finalDiv) {
+    setInterval(() => {
+      if (finalDiv.style.boxShadow) {
+        finalDiv.style.transition = "box-shadow 0.6s ease";
+        finalDiv.style.boxShadow = "0 0 32px rgba(255,215,180,0.7), 0 0 18px #fad6c0";
+        setTimeout(() => {
+          finalDiv.style.boxShadow = "0 0 40px rgba(255,225,200,0.8), 0 0 24px #ffe2bf";
+        }, 600);
+      } else {
+        finalDiv.style.boxShadow = "0 0 35px rgba(255,225,200,0.7)";
+      }
+    }, 2800);
+  }
+  
+  // small manual adjustment for section 4 two polaroid images load (for connector, if svg existed)
+  window.addEventListener('load', () => {
+    adjustConnectorSVG();
+    const images = document.querySelectorAll('.polaroid img');
+    let loadedCount = 0;
+    images.forEach(img => {
+      if (img.complete) loadedCount++;
+      else img.addEventListener('load', () => {
+        loadedCount++;
+        if (loadedCount === images.length) adjustConnectorSVG();
+      });
+    });
+    if (loadedCount === images.length) adjustConnectorSVG();
+  });
+  
+  // console info (non-intrusive)
+  console.log("💌 Voice message audio source is set to: " + VOICE_MSG_PATH);
+</script>
+</body>
+</html>
